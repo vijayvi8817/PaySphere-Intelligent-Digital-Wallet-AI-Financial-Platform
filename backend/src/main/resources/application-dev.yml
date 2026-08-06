@@ -1,0 +1,31 @@
+spring:
+  # PostgreSQL
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:paysphere}
+    username: ${POSTGRES_USER:paysphere_admin}
+    password: ${POSTGRES_PASSWORD:paysphere_secret}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+
+  # JPA (dev overrides)
+  jpa:
+    show-sql: true
+
+  # Redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:paysphere_redis}
+      timeout: 6000ms
+
+# Logging
+logging:
+  level:
+    com.paysphere: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
