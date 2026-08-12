@@ -145,6 +145,39 @@ pay-sphere/
 | PATCH | `/api/v1/beneficiaries/{id}/favorite` | Toggle favorite | Yes |
 | DELETE | `/api/v1/beneficiaries/{id}` | Delete beneficiary | Yes |
 
+### Users
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/users/me` | Get current user profile | Yes |
+| GET | `/api/v1/users/{userId}` | Get user by ID | Yes |
+| PUT | `/api/v1/users/me` | Update profile | Yes |
+| PUT | `/api/v1/users/me/password` | Change password | Yes |
+
+### Analytics
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/analytics` | Financial analytics dashboard | Yes |
+
+### Notifications
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/notifications` | List all notifications | Yes |
+| GET | `/api/v1/notifications/recent` | Recent notifications (top 10) | Yes |
+| GET | `/api/v1/notifications/unread-count` | Unread count | Yes |
+| PATCH | `/api/v1/notifications/{id}/read` | Mark as read | Yes |
+| PATCH | `/api/v1/notifications/read-all` | Mark all as read | Yes |
+
+### Linked Accounts
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/linked-accounts` | Link a bank account | Yes |
+| GET | `/api/v1/linked-accounts` | List linked accounts | Yes |
+| GET | `/api/v1/linked-accounts/{id}` | Get account details | Yes |
+| PUT | `/api/v1/linked-accounts/{id}` | Update account | Yes |
+| DELETE | `/api/v1/linked-accounts/{id}` | Remove account | Yes |
+| PATCH | `/api/v1/linked-accounts/{id}/primary` | Set as primary | Yes |
+| PATCH | `/api/v1/linked-accounts/{id}/verify` | Verify account | Yes |
+
 ---
 
 ## Environment Variables

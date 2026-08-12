@@ -9,6 +9,9 @@ import { DashboardPage } from '@/pages/dashboard/DashboardPage';
 import { WalletPage } from '@/pages/wallet/WalletPage';
 import { TransactionsPage } from '@/pages/transactions/TransactionsPage';
 import { PaymentsPage } from '@/pages/payments/PaymentsPage';
+import { AnalyticsPage } from '@/pages/analytics/AnalyticsPage';
+import { AccountsPage } from '@/pages/accounts/AccountsPage';
+import { SettingsPage } from '@/pages/settings/SettingsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
@@ -37,12 +40,12 @@ export const router = createBrowserRouter([
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'wallet', element: <WalletPage /> },
       { path: 'transactions', element: <TransactionsPage /> },
-      { path: 'accounts', element: <DashboardPage /> },
+      { path: 'accounts', element: <AccountsPage /> },
       { path: 'payments', element: <PaymentsPage /> },
-      { path: 'analytics', element: <DashboardPage /> },
+      { path: 'analytics', element: <AnalyticsPage /> },
       { path: 'team', element: <DashboardPage /> },
-      { path: 'security', element: <DashboardPage /> },
-      { path: 'settings', element: <DashboardPage /> },
+      { path: 'security', element: <SettingsPage /> },
+      { path: 'settings', element: <SettingsPage /> },
     ],
   },
   {
@@ -50,3 +53,4 @@ export const router = createBrowserRouter([
     element: <NotFoundPage />,
   },
 ]);
+

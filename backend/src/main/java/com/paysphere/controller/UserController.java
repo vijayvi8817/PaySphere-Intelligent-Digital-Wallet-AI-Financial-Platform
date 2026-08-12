@@ -1,6 +1,7 @@
 package com.paysphere.controller;
 
 import com.paysphere.dto.request.ChangePasswordRequest;
+import com.paysphere.dto.request.UpdateProfileRequest;
 import com.paysphere.dto.response.ApiResponse;
 import com.paysphere.dto.response.UserResponse;
 import com.paysphere.service.impl.UserServiceImpl;
@@ -42,6 +43,15 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable UUID userId) {
         UserResponse userResponse = userService.getUserById(userId);
         return ResponseEntity.ok(ApiResponse.success(userResponse));
+    }
+
+    @PutMapping("/me")
+    @Operation(summary = "Update current user profile")
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody UpdateProfileRequest request) {
+        UserResponse userResponse = userService.updateProfile(authentication.getName(), request);
+        return ResponseEntity.ok(ApiResponse.success("Profile updated", userResponse));
     }
 
     @PutMapping("/me/password")

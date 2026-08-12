@@ -1,0 +1,15 @@
+package com.paysphere.enums;
+
+public enum NotificationType {
+    TRANSFER_SENT,
+    TRANSFER_RECEIVED,
+    DEPOSIT,
+    WITHDRAWAL,
+    WALLET_FROZEN,
+    WALLET_UNFROZEN,
+    ACCOUNT_LINKED,
+    ACCOUNT_VERIFIED,
+    PASSWORD_CHANGED,
+    PROFILE_UPDATED,
+    SYSTEM
+}

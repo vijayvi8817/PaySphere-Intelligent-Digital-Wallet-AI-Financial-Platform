@@ -20,6 +20,7 @@ import com.paysphere.repository.TransferRepository;
 import com.paysphere.repository.UserRepository;
 import com.paysphere.repository.WalletRepository;
 import com.paysphere.repository.WalletTransactionRepository;
+import com.paysphere.service.NotificationService;
 import com.paysphere.service.TransferService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,7 @@ public class TransferServiceImpl implements TransferService {
     private final UserRepository userRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final TransferMapper transferMapper;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -190,6 +192,19 @@ public class TransferServiceImpl implements TransferService {
 
         log.info("P2P transfer completed: {} → {}, amount=${}, fee=${}, ref={}",
                 senderUser.getEmail(), recipientUser.getEmail(), request.getAmount(), fee, referenceId);
+
+        // 15. Push notifications to both parties
+        notificationService.createNotification(senderUserId,
+                com.paysphere.enums.NotificationType.TRANSFER_SENT,
+                "Money Sent",
+                "You sent $" + request.getAmount() + " to " + recipientUser.getFullName() + ". Ref: " + referenceId,
+                referenceId);
+
+        notificationService.createNotification(recipientUser.getId(),
+                com.paysphere.enums.NotificationType.TRANSFER_RECEIVED,
+                "Money Received",
+                "You received $" + request.getAmount() + " from " + senderUser.getFullName() + ". Ref: " + referenceId,
+                referenceId);
 
         return transferMapper.toResponse(transfer, senderUserId);
     }
