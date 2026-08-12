@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   ArrowLeftRight,
   Wallet,
+  Wallet2,
   BarChart3,
   Settings,
   Shield,
@@ -19,6 +20,7 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { label: 'Wallet', icon: Wallet2, path: '/wallet' },
   { label: 'Transactions', icon: ArrowLeftRight, path: '/transactions' },
   { label: 'Accounts', icon: Wallet, path: '/accounts' },
   { label: 'Payments', icon: CreditCard, path: '/payments' },

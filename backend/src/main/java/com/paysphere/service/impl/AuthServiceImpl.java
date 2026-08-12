@@ -5,12 +5,14 @@ import com.paysphere.dto.request.RegisterRequest;
 import com.paysphere.dto.response.AuthResponse;
 import com.paysphere.entity.Role;
 import com.paysphere.entity.User;
+import com.paysphere.entity.Wallet;
 import com.paysphere.enums.RoleName;
 import com.paysphere.exception.DuplicateResourceException;
 import com.paysphere.exception.ResourceNotFoundException;
 import com.paysphere.exception.UnauthorizedException;
 import com.paysphere.repository.RoleRepository;
 import com.paysphere.repository.UserRepository;
+import com.paysphere.repository.WalletRepository;
 import com.paysphere.security.CustomUserDetails;
 import com.paysphere.security.JwtTokenProvider;
 import com.paysphere.service.AuthService;
@@ -37,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -66,6 +69,15 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
         log.info("User registered successfully: {}", user.getEmail());
+
+        // Auto-create a wallet for the new user
+        String walletNumber = generateWalletNumber();
+        Wallet wallet = Wallet.builder()
+                .user(user)
+                .walletNumber(walletNumber)
+                .build();
+        walletRepository.save(wallet);
+        log.info("Wallet created for user {}: {}", user.getEmail(), walletNumber);
 
         // Authenticate immediately after registration
         Authentication authentication = authenticationManager.authenticate(
@@ -160,5 +172,17 @@ public class AuthServiceImpl implements AuthService {
                 .fullName(user.getFullName())
                 .roles(roles)
                 .build();
+    }
+
+    /**
+     * Generates a unique 16-digit wallet number.
+     */
+    private String generateWalletNumber() {
+        String number;
+        do {
+            long part1 = (long) (Math.random() * 9_000_000_000_000_000L) + 1_000_000_000_000_000L;
+            number = String.valueOf(part1);
+        } while (walletRepository.existsByWalletNumber(number));
+        return number;
     }
 }

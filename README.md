@@ -98,13 +98,52 @@ pay-sphere/
 
 ---
 
-## API Endpoints (Phase 1)
+## API Endpoints
 
+### Infrastructure
 | Method | Path | Description | Auth |
 |---|---|---|---|
 | GET | `/api/v1/health` | Health check | No |
 | GET | `/swagger-ui.html` | API Documentation | No |
 | GET | `/actuator/health` | Actuator health | No |
+
+### Authentication
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/auth/register` | Register new user | No |
+| POST | `/api/v1/auth/login` | Login | No |
+| POST | `/api/v1/auth/refresh` | Refresh token | No |
+| POST | `/api/v1/auth/logout` | Logout (blacklist) | Yes |
+
+### Digital Wallet
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/wallet` | Get wallet | Yes |
+| POST | `/api/v1/wallet/deposit` | Deposit money | Yes |
+| POST | `/api/v1/wallet/withdraw` | Withdraw money | Yes |
+| PATCH | `/api/v1/wallet/freeze` | Freeze wallet | Yes |
+| PATCH | `/api/v1/wallet/unfreeze` | Unfreeze wallet | Yes |
+| GET | `/api/v1/wallet/transactions` | Wallet transactions | Yes |
+| GET | `/api/v1/wallet/dashboard` | Wallet dashboard data | Yes |
+| GET | `/api/v1/wallet/statement` | Monthly statement | Yes |
+
+### P2P Transfers
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/transfers` | Send money (P2P) | Yes |
+| GET | `/api/v1/transfers` | List transfers | Yes |
+| GET | `/api/v1/transfers/{id}` | Transfer details | Yes |
+| GET | `/api/v1/transfers/search` | Search transfers | Yes |
+| GET | `/api/v1/transfers/summary` | Monthly summary | Yes |
+
+### Beneficiaries
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/beneficiaries` | Add beneficiary | Yes |
+| GET | `/api/v1/beneficiaries` | List beneficiaries | Yes |
+| GET | `/api/v1/beneficiaries/favorites` | Favorite beneficiaries | Yes |
+| PATCH | `/api/v1/beneficiaries/{id}/favorite` | Toggle favorite | Yes |
+| DELETE | `/api/v1/beneficiaries/{id}` | Delete beneficiary | Yes |
 
 ---
 
