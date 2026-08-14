@@ -11,6 +11,7 @@ import {
   Shield,
   CreditCard,
   Users,
+  Repeat,
   X,
 } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
@@ -25,6 +26,7 @@ const navItems = [
   { label: 'Accounts', icon: Wallet, path: '/accounts' },
   { label: 'Payments', icon: CreditCard, path: '/payments' },
   { label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { label: 'Recurring', icon: Repeat, path: '/recurring' },
   { label: 'Team', icon: Users, path: '/team' },
   { label: 'Security', icon: Shield, path: '/security' },
   { label: 'Settings', icon: Settings, path: '/settings' },

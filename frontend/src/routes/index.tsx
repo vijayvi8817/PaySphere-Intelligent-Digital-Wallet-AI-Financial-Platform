@@ -12,6 +12,8 @@ import { PaymentsPage } from '@/pages/payments/PaymentsPage';
 import { AnalyticsPage } from '@/pages/analytics/AnalyticsPage';
 import { AccountsPage } from '@/pages/accounts/AccountsPage';
 import { SettingsPage } from '@/pages/settings/SettingsPage';
+import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
+import { RecurringPage } from '@/pages/recurring/RecurringPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
@@ -43,6 +45,8 @@ export const router = createBrowserRouter([
       { path: 'accounts', element: <AccountsPage /> },
       { path: 'payments', element: <PaymentsPage /> },
       { path: 'analytics', element: <AnalyticsPage /> },
+      { path: 'recurring', element: <RecurringPage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
       { path: 'team', element: <DashboardPage /> },
       { path: 'security', element: <SettingsPage /> },
       { path: 'settings', element: <SettingsPage /> },
@@ -53,4 +57,3 @@ export const router = createBrowserRouter([
     element: <NotFoundPage />,
   },
 ]);
-

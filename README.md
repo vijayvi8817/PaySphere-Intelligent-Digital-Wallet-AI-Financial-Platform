@@ -9,7 +9,7 @@
 | Layer | Technology |
 |---|---|
 | **Frontend** | React 19, TypeScript, Vite, Tailwind CSS, shadcn/ui, React Router, React Query, React Hook Form, Zod, Axios, Recharts, Framer Motion |
-| **Backend** | Java 21, Spring Boot 3.3, Spring Security, JWT, Spring Data JPA, Hibernate, Maven, PostgreSQL, Flyway, Swagger/OpenAPI |
+| **Backend** | Java 21, Spring Boot 3.3, Spring Security, JWT, Spring Data JPA, Hibernate, Spring Scheduler, Maven, PostgreSQL, Flyway, Swagger/OpenAPI |
 | **Realtime** | WebSocket, STOMP |
 | **Storage** | PostgreSQL 16, Redis 7 |
 | **AI Service** | Python FastAPI, scikit-learn, Sentence Transformers |
@@ -177,6 +177,22 @@ pay-sphere/
 | DELETE | `/api/v1/linked-accounts/{id}` | Remove account | Yes |
 | PATCH | `/api/v1/linked-accounts/{id}/primary` | Set as primary | Yes |
 | PATCH | `/api/v1/linked-accounts/{id}/verify` | Verify account | Yes |
+
+### Recurring Payments
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/recurring-payments` | Create recurring payment | Yes |
+| GET | `/api/v1/recurring-payments` | List recurring payments | Yes |
+| GET | `/api/v1/recurring-payments/{id}` | Get payment details | Yes |
+| PATCH | `/api/v1/recurring-payments/{id}/pause` | Pause payment | Yes |
+| PATCH | `/api/v1/recurring-payments/{id}/resume` | Resume payment | Yes |
+| DELETE | `/api/v1/recurring-payments/{id}` | Cancel payment | Yes |
+
+### Export
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/export/wallet-transactions` | Export wallet transactions CSV | Yes |
+| GET | `/api/v1/export/transfers` | Export transfers CSV | Yes |
 
 ---
 

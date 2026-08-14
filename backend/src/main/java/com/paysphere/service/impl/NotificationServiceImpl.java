@@ -10,6 +10,7 @@ import com.paysphere.mapper.NotificationMapper;
 import com.paysphere.repository.NotificationRepository;
 import com.paysphere.repository.UserRepository;
 import com.paysphere.service.NotificationService;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @Transactional
@@ -45,8 +47,21 @@ public class NotificationServiceImpl implements NotificationService {
                 .referenceId(referenceId)
                 .build();
 
-        notificationRepository.save(notification);
+        notification = notificationRepository.save(notification);
         log.info("Notification created: type={}, userId={}", type, userId);
+
+        // Push real-time notification via WebSocket
+        try {
+            NotificationResponse response = notificationMapper.toResponse(notification);
+            messagingTemplate.convertAndSendToUser(
+                    userId.toString(),
+                    "/queue/notifications",
+                    response
+            );
+            log.debug("WebSocket notification pushed to userId={}", userId);
+        } catch (Exception e) {
+            log.warn("Failed to push WebSocket notification: {}", e.getMessage());
+        }
     }
 
     @Override

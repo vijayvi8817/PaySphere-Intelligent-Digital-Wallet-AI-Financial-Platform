@@ -10,6 +10,7 @@ import {
   Shield,
   CreditCard,
   Users,
+  Repeat,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ const navItems = [
   { label: 'Accounts', icon: Wallet, path: '/accounts' },
   { label: 'Payments', icon: CreditCard, path: '/payments' },
   { label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { label: 'Recurring', icon: Repeat, path: '/recurring' },
 ];
 
 const bottomItems = [

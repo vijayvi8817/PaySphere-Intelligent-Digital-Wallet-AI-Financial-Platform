@@ -13,7 +13,9 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
+  Download,
 } from 'lucide-react';
+import { exportApi, downloadBlob } from '@/api/export';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -116,6 +118,22 @@ export function TransactionsPage() {
           </h1>
           <p className="text-muted-foreground mt-1">Track all your P2P transfers and payments</p>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={async () => {
+            try {
+              const blob = await exportApi.downloadTransfers(direction || 'all');
+              downloadBlob(blob, `transfers_${direction || 'all'}.csv`);
+            } catch {
+              // Silently fail
+            }
+          }}
+        >
+          <Download className="h-4 w-4" />
+          Export CSV
+        </Button>
       </motion.div>
 
       {/* Summary Cards */}

@@ -3,12 +3,13 @@ import { motion } from 'framer-motion';
 import {
   Wallet, ArrowDownLeft, ArrowUpRight, TrendingUp, Award, Snowflake,
   Lock, Unlock, Eye, EyeOff, RefreshCw, FileText, BarChart3, Clock,
-  Plus, Minus, ChevronLeft, ChevronRight,
+  Plus, Minus, ChevronLeft, ChevronRight, Download,
 } from 'lucide-react';
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
+import { exportApi, downloadBlob } from '@/api/export';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +23,6 @@ import type { WalletTransaction } from '@/types/wallet';
 
 const containerV = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
 const itemV = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
-const CHART_COLORS = ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd'];
 const PIE_COLORS = ['#6366f1', '#f59e0b'];
 
 type Tab = 'overview' | 'transactions' | 'statement';
@@ -434,6 +434,22 @@ export function WalletPage() {
                     return <option key={y} value={y}>{y}</option>;
                   })}
                 </select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={async () => {
+                    try {
+                      const blob = await exportApi.downloadWalletTransactions(stmtMonth, stmtYear);
+                      downloadBlob(blob, `wallet_transactions_${stmtYear}_${stmtMonth}.csv`);
+                    } catch {
+                      // Silently fail
+                    }
+                  }}
+                >
+                  <Download className="h-4 w-4" />
+                  CSV
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
