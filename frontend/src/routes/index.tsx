@@ -14,6 +14,12 @@ import { AccountsPage } from '@/pages/accounts/AccountsPage';
 import { SettingsPage } from '@/pages/settings/SettingsPage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { RecurringPage } from '@/pages/recurring/RecurringPage';
+import { QrPaymentPage } from '@/pages/qr/QrPaymentPage';
+import { DisputesPage } from '@/pages/disputes/DisputesPage';
+import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
+import { KycVerificationPage } from '@/pages/kyc/KycVerificationPage';
+import { AiInsightsPage } from '@/pages/ai/AiInsightsPage';
+import { MultiCurrencyPage } from '@/pages/fx/MultiCurrencyPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
@@ -46,6 +52,12 @@ export const router = createBrowserRouter([
       { path: 'payments', element: <PaymentsPage /> },
       { path: 'analytics', element: <AnalyticsPage /> },
       { path: 'recurring', element: <RecurringPage /> },
+      { path: 'qr-payments', element: <QrPaymentPage /> },
+      { path: 'disputes', element: <DisputesPage /> },
+      { path: 'kyc', element: <KycVerificationPage /> },
+      { path: 'ai-insights', element: <AiInsightsPage /> },
+      { path: 'fx', element: <MultiCurrencyPage /> },
+      { path: 'admin', element: <AdminDashboardPage /> },
       { path: 'notifications', element: <NotificationsPage /> },
       { path: 'team', element: <DashboardPage /> },
       { path: 'security', element: <SettingsPage /> },

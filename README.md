@@ -194,6 +194,54 @@ pay-sphere/
 | GET | `/api/v1/export/wallet-transactions` | Export wallet transactions CSV | Yes |
 | GET | `/api/v1/export/transfers` | Export transfers CSV | Yes |
 
+### QR Payments
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/qr-payments/generate` | Generate payment QR code | Yes |
+| GET | `/api/v1/qr-payments/token/{token}` | Verify & inspect QR token | Yes |
+| POST | `/api/v1/qr-payments/pay/{token}` | Pay via QR token | Yes |
+| GET | `/api/v1/qr-payments/my-codes` | List generated QR codes | Yes |
+
+### Transaction Disputes
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/disputes` | File a transfer dispute | Yes |
+| GET | `/api/v1/disputes` | List user disputes | Yes |
+| GET | `/api/v1/disputes/{disputeId}` | Get dispute details | Yes |
+
+### Admin Dashboard & Management
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/admin/stats` | System aggregate statistics | Yes (Admin) |
+| GET | `/api/v1/admin/users` | List & filter users | Yes (Admin) |
+| GET | `/api/v1/admin/users/{userId}` | Get user detail view | Yes (Admin) |
+| PATCH | `/api/v1/admin/users/{userId}/suspend` | Suspend user account | Yes (Admin) |
+| PATCH | `/api/v1/admin/users/{userId}/activate` | Activate user account | Yes (Admin) |
+| GET | `/api/v1/admin/disputes` | List all disputes | Yes (Admin) |
+| PATCH | `/api/v1/admin/disputes/{disputeId}/resolve` | Resolve / reject dispute | Yes (Admin) |
+| GET | `/api/v1/admin/kyc` | List pending KYC submissions | Yes (Admin) |
+| PATCH | `/api/v1/admin/kyc/{kycId}/review` | Review & approve/reject KYC submission | Yes (Admin) |
+
+### Identity Verification (KYC)
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| POST | `/api/v1/kyc` | Submit identity verification | Yes |
+| GET | `/api/v1/kyc/latest` | Get latest KYC submission | Yes |
+| GET | `/api/v1/kyc/history` | List KYC submission history | Yes |
+
+### AI Financial Intelligence
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/ai/advisor` | Get AI financial health & smart insights | Yes |
+| POST | `/api/v1/ai/ask` | Ask AI advisor custom financial question | Yes |
+
+### Multi-Currency Foreign Exchange (FX)
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | `/api/v1/fx/wallets` | List user multi-currency wallets | Yes |
+| GET | `/api/v1/fx/rates` | List live exchange rates | Yes |
+| POST | `/api/v1/fx/convert` | Execute instant currency conversion | Yes |
+
 ---
 
 ## Environment Variables

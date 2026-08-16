@@ -11,8 +11,13 @@ import {
   CreditCard,
   Users,
   Repeat,
+  QrCode,
+  FileWarning,
+  ShieldCheck,
   ChevronLeft,
   ChevronRight,
+  BrainCircuit,
+  Globe,
 } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
 import { Separator } from '@/components/ui/separator';
@@ -27,14 +32,20 @@ interface SidebarProps {
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { label: 'Wallet', icon: Wallet2, path: '/wallet' },
+  { label: 'Multi-Currency FX', icon: Globe, path: '/fx' },
   { label: 'Transactions', icon: ArrowLeftRight, path: '/transactions' },
   { label: 'Accounts', icon: Wallet, path: '/accounts' },
   { label: 'Payments', icon: CreditCard, path: '/payments' },
+  { label: 'QR Payments', icon: QrCode, path: '/qr-payments' },
+  { label: 'AI Intelligence', icon: BrainCircuit, path: '/ai-insights' },
   { label: 'Analytics', icon: BarChart3, path: '/analytics' },
   { label: 'Recurring', icon: Repeat, path: '/recurring' },
+  { label: 'KYC Verification', icon: ShieldCheck, path: '/kyc' },
+  { label: 'Disputes', icon: FileWarning, path: '/disputes' },
 ];
 
 const bottomItems = [
+  { label: 'Admin', icon: ShieldCheck, path: '/admin' },
   { label: 'Team', icon: Users, path: '/team' },
   { label: 'Security', icon: Shield, path: '/security' },
   { label: 'Settings', icon: Settings, path: '/settings' },
