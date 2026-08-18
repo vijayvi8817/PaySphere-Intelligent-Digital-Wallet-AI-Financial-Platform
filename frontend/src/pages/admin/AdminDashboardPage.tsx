@@ -4,13 +4,18 @@ import { motion } from 'framer-motion';
 import {
   ShieldCheck, Users, ArrowLeftRight, DollarSign, AlertTriangle,
   Wallet, TrendingUp, UserCheck, Search, ChevronDown, ChevronUp,
-  Ban, Eye,
+  Ban, Eye, ShieldAlert
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { adminApi } from '@/api/admin';
+import { getAdminAuditLogs } from '@/api/audit';
+import { AuditLog } from '@/types/audit';
 import toast from 'react-hot-toast';
+import { getPendingKycSubmissions, reviewKycSubmission } from '@/api/kyc';
+import { KycDocumentResponse } from '@/types/kyc';
 
 const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
 const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
@@ -21,17 +26,14 @@ const formatCurrency = (val: number) =>
 const formatDate = (dateStr: string) =>
   new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-import { getPendingKycSubmissions, reviewKycSubmission } from '@/api/kyc';
-import { KycDocumentResponse } from '@/types/kyc';
-
-type Tab = 'overview' | 'users' | 'disputes' | 'kyc';
+type Tab = 'overview' | 'users' | 'disputes' | 'kyc' | 'audit';
 
 export function AdminDashboardPage() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [userPage, setUserPage] = useState(0);
   const [disputePage, setDisputePage] = useState(0);
-  const [kycPage, setKycPage] = useState(0);
+  const [kycPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [disputeStatusFilter, setDisputeStatusFilter] = useState('');
@@ -50,7 +52,6 @@ export function AdminDashboardPage() {
     enabled: activeTab === 'users' || activeTab === 'overview',
   });
   const users = usersQuery.data?.data?.content ?? [];
-  const userTotalPages = usersQuery.data?.data?.totalPages ?? 0;
 
   const disputesQuery = useQuery({
     queryKey: ['admin-disputes', disputePage, disputeStatusFilter],
@@ -58,7 +59,6 @@ export function AdminDashboardPage() {
     enabled: activeTab === 'disputes',
   });
   const disputes = disputesQuery.data?.data?.content ?? [];
-  const disputeTotalPages = disputesQuery.data?.data?.totalPages ?? 0;
 
   const kycQuery = useQuery({
     queryKey: ['admin-kyc', kycPage],
@@ -66,7 +66,13 @@ export function AdminDashboardPage() {
     enabled: activeTab === 'kyc',
   });
   const kycDocs: KycDocumentResponse[] = kycQuery.data?.content ?? [];
-  const kycTotalPages = kycQuery.data?.totalPages ?? 0;
+
+  const auditQuery = useQuery({
+    queryKey: ['admin-audit'],
+    queryFn: () => getAdminAuditLogs(),
+    enabled: activeTab === 'audit',
+  });
+  const auditLogs: AuditLog[] = auditQuery.data ?? [];
 
   const kycReviewMutation = useMutation({
     mutationFn: ({ kycId, status, reason }: { kycId: string; status: 'APPROVED' | 'REJECTED'; reason?: string }) =>
@@ -86,11 +92,13 @@ export function AdminDashboardPage() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); queryClient.invalidateQueries({ queryKey: ['admin-stats'] }); toast.success('User suspended'); },
     onError: (e: any) => toast.error(e.response?.data?.message ?? 'Failed'),
   });
+
   const activateMutation = useMutation({
     mutationFn: adminApi.activateUser,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); queryClient.invalidateQueries({ queryKey: ['admin-stats'] }); toast.success('User activated'); },
     onError: (e: any) => toast.error(e.response?.data?.message ?? 'Failed'),
   });
+
   const resolveMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       adminApi.resolveDispute(id, { status, resolutionNote: resolveNote }),
@@ -104,12 +112,12 @@ export function AdminDashboardPage() {
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl flex items-center gap-2">
           <ShieldCheck className="h-7 w-7 text-primary" /> Admin Dashboard
         </h1>
-        <p className="text-muted-foreground mt-1">System overview, user management, disputes & identity verification</p>
+        <p className="text-muted-foreground mt-1">System overview, user management, disputes, identity verification & SOC audit</p>
       </motion.div>
 
       {/* Tabs */}
-      <motion.div variants={itemVariants} className="flex gap-2 bg-muted/50 p-1 rounded-lg w-fit">
-        {([['overview', 'Overview', TrendingUp], ['users', 'Users', Users], ['disputes', 'Disputes', AlertTriangle], ['kyc', 'KYC Submissions', ShieldCheck]] as [Tab, string, any][]).map(([id, label, Icon]) => (
+      <motion.div variants={itemVariants} className="flex gap-2 bg-muted/50 p-1 rounded-lg w-fit flex-wrap">
+        {([['overview', 'Overview', TrendingUp], ['users', 'Users', Users], ['disputes', 'Disputes', AlertTriangle], ['kyc', 'KYC Submissions', ShieldCheck], ['audit', 'SOC Security Audit', ShieldAlert]] as [Tab, string, any][]).map(([id, label, Icon]) => (
           <Button key={id} size="sm" variant={activeTab === id ? 'default' : 'ghost'} onClick={() => setActiveTab(id)}
             className={activeTab === id ? 'bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg' : ''}>
             <Icon className="h-4 w-4 mr-1.5" />{label}
@@ -152,20 +160,6 @@ export function AdminDashboardPage() {
               </Card>
             ))}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardContent className="p-4 flex items-center gap-3">
-                <ArrowLeftRight className="h-8 w-8 text-teal-500" />
-                <div><p className="text-lg font-bold">{stats.transfersThisMonth}</p><p className="text-xs text-muted-foreground">Transfers This Month</p></div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 flex items-center gap-3">
-                <DollarSign className="h-8 w-8 text-amber-500" />
-                <div><p className="text-lg font-bold">{formatCurrency(stats.transferVolumeThisMonth)}</p><p className="text-xs text-muted-foreground">Volume This Month</p></div>
-              </CardContent>
-            </Card>
-          </div>
         </motion.div>
       )}
 
@@ -191,7 +185,7 @@ export function AdminDashboardPage() {
           ) : (
             users.map((user) => (
               <Card key={user.id} className={`border-l-4 ${user.status === 'ACTIVE' ? 'border-l-emerald-500' : user.status === 'SUSPENDED' ? 'border-l-red-500' : 'border-l-amber-500'}`}>
-                <CardContent className="p-4">
+                <CardContent className="p-4 space-y-3">
                   <div className="flex items-center justify-between cursor-pointer" onClick={() => setExpandedUserId(expandedUserId === user.id ? null : user.id)}>
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
@@ -211,36 +205,21 @@ export function AdminDashboardPage() {
                     </div>
                   </div>
                   {expandedUserId === user.id && (
-                    <div className="mt-4 pt-4 border-t space-y-3">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                        <div><p className="text-xs text-muted-foreground">Wallet</p><p className="font-bold">{formatCurrency(user.walletBalance)}</p></div>
-                        <div><p className="text-xs text-muted-foreground">Sent</p><p className="font-bold">{user.totalTransfersSent}</p></div>
-                        <div><p className="text-xs text-muted-foreground">Received</p><p className="font-bold">{user.totalTransfersReceived}</p></div>
-                        <div><p className="text-xs text-muted-foreground">Disputes</p><p className="font-bold">{user.activeDisputes}</p></div>
-                      </div>
-                      <div className="flex gap-2">
-                        {user.status !== 'SUSPENDED' ? (
-                          <Button size="sm" variant="destructive" onClick={() => suspendMutation.mutate(user.id)} disabled={suspendMutation.isPending}>
-                            <Ban className="h-3.5 w-3.5 mr-1" /> Suspend
-                          </Button>
-                        ) : (
-                          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => activateMutation.mutate(user.id)} disabled={activateMutation.isPending}>
-                            <UserCheck className="h-3.5 w-3.5 mr-1" /> Activate
-                          </Button>
-                        )}
-                      </div>
+                    <div className="pt-3 border-t flex gap-2">
+                      {user.status !== 'SUSPENDED' ? (
+                        <Button size="sm" variant="destructive" onClick={() => suspendMutation.mutate(user.id)} disabled={suspendMutation.isPending}>
+                          <Ban className="h-3.5 w-3.5 mr-1" /> Suspend Account
+                        </Button>
+                      ) : (
+                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => activateMutation.mutate(user.id)} disabled={activateMutation.isPending}>
+                          <UserCheck className="h-3.5 w-3.5 mr-1" /> Activate Account
+                        </Button>
+                      )}
                     </div>
                   )}
                 </CardContent>
               </Card>
             ))
-          )}
-          {userTotalPages > 1 && (
-            <div className="flex justify-center gap-2">
-              <Button variant="outline" size="sm" disabled={userPage === 0} onClick={() => setUserPage((p) => p - 1)}>Previous</Button>
-              <span className="text-sm text-muted-foreground flex items-center px-3">Page {userPage + 1} of {userTotalPages}</span>
-              <Button variant="outline" size="sm" disabled={userPage >= userTotalPages - 1} onClick={() => setUserPage((p) => p + 1)}>Next</Button>
-            </div>
           )}
         </motion.div>
       )}
@@ -258,54 +237,37 @@ export function AdminDashboardPage() {
           {disputes.length === 0 ? (
             <Card><CardContent className="py-12 text-center"><AlertTriangle className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" /><p className="text-muted-foreground">No disputes found</p></CardContent></Card>
           ) : (
-            disputes.map((d) => {
-              const colors: Record<string, string> = { OPEN: 'border-l-amber-500', UNDER_REVIEW: 'border-l-blue-500', RESOLVED: 'border-l-emerald-500', REJECTED: 'border-l-red-500' };
-              const badges: Record<string, string> = { OPEN: 'bg-amber-500/10 text-amber-500', UNDER_REVIEW: 'bg-blue-500/10 text-blue-500', RESOLVED: 'bg-emerald-500/10 text-emerald-500', REJECTED: 'bg-red-500/10 text-red-500' };
-              return (
-                <Card key={d.id} className={`border-l-4 ${colors[d.status] || ''}`}>
-                  <CardContent className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-sm">{d.reason.replace('_', ' ')} — {d.counterpartyName}</p>
-                        <p className="text-xs text-muted-foreground">Ref: {d.transferReferenceId} · {formatCurrency(d.transferAmount)}</p>
-                      </div>
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${badges[d.status] || ''}`}>{d.status.replace('_', ' ')}</span>
+            disputes.map((d) => (
+              <Card key={d.id} className="border-l-4 border-l-amber-500">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">{d.reason.replace('_', ' ')} — {d.counterpartyName}</p>
+                      <p className="text-xs text-muted-foreground">Ref: {d.transferReferenceId} · {formatCurrency(d.transferAmount)}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{d.description}</p>
-                    {d.resolutionNote && <p className="text-sm bg-muted/50 rounded p-2 border">{d.resolutionNote}</p>}
-                    {(d.status === 'OPEN' || d.status === 'UNDER_REVIEW') && (
-                      resolveId === d.id ? (
-                        <div className="space-y-2 border rounded-lg p-3 bg-muted/30">
-                          <Input placeholder="Resolution note..." value={resolveNote} onChange={(e) => setResolveNote(e.target.value)} />
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline" onClick={() => setResolveId(null)}>Cancel</Button>
-                            {d.status === 'OPEN' && <Button size="sm" className="bg-blue-600" onClick={() => resolveMutation.mutate({ id: d.id, status: 'UNDER_REVIEW' })} disabled={!resolveNote || resolveMutation.isPending}>Mark Under Review</Button>}
-                            <Button size="sm" className="bg-emerald-600" onClick={() => resolveMutation.mutate({ id: d.id, status: 'RESOLVED' })} disabled={!resolveNote || resolveMutation.isPending}>Resolve</Button>
-                            <Button size="sm" variant="destructive" onClick={() => resolveMutation.mutate({ id: d.id, status: 'REJECTED' })} disabled={!resolveNote || resolveMutation.isPending}>Reject</Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <Button size="sm" variant="outline" onClick={() => { setResolveId(d.id); setResolveNote(''); }}>
-                          <Eye className="h-3.5 w-3.5 mr-1" /> Review
-                        </Button>
-                      )
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })
-          )}
-          {disputeTotalPages > 1 && (
-            <div className="flex justify-center gap-2">
-              <Button variant="outline" size="sm" disabled={disputePage === 0} onClick={() => setDisputePage((p) => p - 1)}>Previous</Button>
-              <span className="text-sm text-muted-foreground flex items-center px-3">Page {disputePage + 1} of {disputeTotalPages}</span>
-              <Button variant="outline" size="sm" disabled={disputePage >= disputeTotalPages - 1} onClick={() => setDisputePage((p) => p + 1)}>Next</Button>
-            </div>
+                    <Badge variant="outline">{d.status}</Badge>
+                  </div>
+                  {resolveId === d.id ? (
+                    <div className="space-y-2 pt-2 border-t">
+                      <Input placeholder="Resolution note..." value={resolveNote} onChange={(e) => setResolveNote(e.target.value)} />
+                      <div className="flex gap-2 justify-end">
+                        <Button size="sm" variant="ghost" onClick={() => setResolveId(null)}>Cancel</Button>
+                        <Button size="sm" className="bg-emerald-600" onClick={() => resolveMutation.mutate({ id: d.id, status: 'RESOLVED' })} disabled={!resolveNote || resolveMutation.isPending}>Resolve</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={() => { setResolveId(d.id); setResolveNote(''); }}>
+                      <Eye className="h-3.5 w-3.5 mr-1" /> Review Dispute
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ))
           )}
         </motion.div>
       )}
 
-      {/* KYC SUBMISSIONS TAB */}
+      {/* KYC TAB */}
       {activeTab === 'kyc' && (
         <motion.div variants={itemVariants} className="space-y-4">
           {kycDocs.length === 0 ? (
@@ -319,13 +281,13 @@ export function AdminDashboardPage() {
                       <p className="font-medium text-sm">{doc.userName} ({doc.userEmail})</p>
                       <p className="text-xs text-muted-foreground">Doc: {doc.documentType} · #{doc.documentNumber}</p>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500">{doc.status}</span>
+                    <Badge>{doc.status}</Badge>
                   </div>
 
                   <div className="flex gap-2 pt-2">
                     <Button 
                       size="sm" 
-                      className="bg-emerald-600 hover:bg-emerald-700" 
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white" 
                       onClick={() => kycReviewMutation.mutate({ kycId: doc.id, status: 'APPROVED' })}
                       disabled={kycReviewMutation.isPending}
                     >
@@ -364,13 +326,41 @@ export function AdminDashboardPage() {
               </Card>
             ))
           )}
-          {kycTotalPages > 1 && (
-            <div className="flex justify-center gap-2">
-              <Button variant="outline" size="sm" disabled={kycPage === 0} onClick={() => setKycPage((p) => p - 1)}>Previous</Button>
-              <span className="text-sm text-muted-foreground flex items-center px-3">Page {kycPage + 1} of {kycTotalPages}</span>
-              <Button variant="outline" size="sm" disabled={kycPage >= kycTotalPages - 1} onClick={() => setKycPage((p) => p + 1)}>Next</Button>
-            </div>
-          )}
+        </motion.div>
+      )}
+
+      {/* SOC AUDIT TAB */}
+      {activeTab === 'audit' && (
+        <motion.div variants={itemVariants} className="space-y-4">
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5 text-red-500" /> System-Wide Security Audit Stream
+              </h3>
+              {auditLogs.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">No security logs recorded yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {auditLogs.map((log) => (
+                    <div key={log.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/20 text-xs">
+                      <div className="flex items-center gap-3">
+                        <Badge variant={log.severity === 'CRITICAL' ? 'destructive' : 'outline'}>
+                          {log.severity}
+                        </Badge>
+                        <span className="font-semibold">{log.userEmail}</span>
+                        <span className="text-muted-foreground">[{log.action}]</span>
+                        <span className="font-mono text-muted-foreground">{log.details}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-muted-foreground font-mono">
+                        <span>{log.ipAddress}</span>
+                        <span>{new Date(log.createdAt).toLocaleTimeString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
       )}
     </motion.div>

@@ -43,6 +43,14 @@ public class AdminController {
     private final AdminService adminService;
     private final DisputeService disputeService;
     private final KycService kycService;
+    private final com.paysphere.service.AuditLogService auditLogService;
+
+    @GetMapping("/audit")
+    @Operation(summary = "List system audit logs for security monitoring")
+    public ResponseEntity<ApiResponse<java.util.List<com.paysphere.dto.response.AuditLogResponse>>> getAuditLogs() {
+        java.util.List<com.paysphere.dto.response.AuditLogResponse> logs = auditLogService.getRecentSystemLogs();
+        return ResponseEntity.ok(ApiResponse.success("System audit logs retrieved", logs));
+    }
 
     @GetMapping("/stats")
     @Operation(summary = "Get system-wide statistics")

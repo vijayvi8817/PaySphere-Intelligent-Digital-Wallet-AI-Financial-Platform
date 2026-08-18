@@ -20,6 +20,9 @@ import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { KycVerificationPage } from '@/pages/kyc/KycVerificationPage';
 import { AiInsightsPage } from '@/pages/ai/AiInsightsPage';
 import { MultiCurrencyPage } from '@/pages/fx/MultiCurrencyPage';
+import { SavingsGoalsPage } from '@/pages/savings/SavingsGoalsPage';
+import { VirtualCardsPage } from '@/pages/cards/VirtualCardsPage';
+import { AuditLogsPage } from '@/pages/security/AuditLogsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
@@ -47,6 +50,8 @@ export const router = createBrowserRouter([
     children: [
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'wallet', element: <WalletPage /> },
+      { path: 'savings', element: <SavingsGoalsPage /> },
+      { path: 'cards', element: <VirtualCardsPage /> },
       { path: 'transactions', element: <TransactionsPage /> },
       { path: 'accounts', element: <AccountsPage /> },
       { path: 'payments', element: <PaymentsPage /> },
@@ -57,10 +62,11 @@ export const router = createBrowserRouter([
       { path: 'kyc', element: <KycVerificationPage /> },
       { path: 'ai-insights', element: <AiInsightsPage /> },
       { path: 'fx', element: <MultiCurrencyPage /> },
+      { path: 'audit', element: <AuditLogsPage /> },
       { path: 'admin', element: <AdminDashboardPage /> },
       { path: 'notifications', element: <NotificationsPage /> },
       { path: 'team', element: <DashboardPage /> },
-      { path: 'security', element: <SettingsPage /> },
+      { path: 'security', element: <AuditLogsPage /> },
       { path: 'settings', element: <SettingsPage /> },
     ],
   },

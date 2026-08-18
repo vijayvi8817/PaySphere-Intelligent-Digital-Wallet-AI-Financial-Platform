@@ -7,9 +7,7 @@ import {
   Wallet2,
   BarChart3,
   Settings,
-  Shield,
   CreditCard,
-  Users,
   Repeat,
   QrCode,
   FileWarning,
@@ -18,6 +16,8 @@ import {
   ChevronRight,
   BrainCircuit,
   Globe,
+  PiggyBank,
+  ShieldAlert,
 } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
 import { Separator } from '@/components/ui/separator';
@@ -32,6 +32,8 @@ interface SidebarProps {
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { label: 'Wallet', icon: Wallet2, path: '/wallet' },
+  { label: 'Savings Vaults', icon: PiggyBank, path: '/savings' },
+  { label: 'Virtual Cards', icon: CreditCard, path: '/cards' },
   { label: 'Multi-Currency FX', icon: Globe, path: '/fx' },
   { label: 'Transactions', icon: ArrowLeftRight, path: '/transactions' },
   { label: 'Accounts', icon: Wallet, path: '/accounts' },
@@ -46,8 +48,7 @@ const navItems = [
 
 const bottomItems = [
   { label: 'Admin', icon: ShieldCheck, path: '/admin' },
-  { label: 'Team', icon: Users, path: '/team' },
-  { label: 'Security', icon: Shield, path: '/security' },
+  { label: 'Security Audit', icon: ShieldAlert, path: '/audit' },
   { label: 'Settings', icon: Settings, path: '/settings' },
 ];
 
